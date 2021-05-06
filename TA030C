@@ -3,7 +3,7 @@ echo $jobname $pid `date` "procedure TA030 started" >> $MSGLOG
 rc=0
  
 # ---------------------------------------------------
-# SAG Protective delete Oct2010
+# SAG Protective delete Oct20100000
 # ---------------------------------------------------
 >${workdir}/${PROD}.TA${CO}030M.DISS.WKF02.A0464.sag
 >${workdir}/${PROD}.TA${CO}030M.DISS.WKF12.A0464
