@@ -1,0 +1,525 @@
+#!/bin/bsh
+echo $jobname $pid `date` "procedure TA030 started" >> $MSGLOG
+rc=0
+ 
+# ---------------------------------------------------
+# SAG Protective delete Oct2010
+# ---------------------------------------------------
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF02.A0464.sag
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF12.A0464
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF02.A0465.sag
+>${printdir}/${PROD}.TA${CO}030M.DISS.PRT01.A0445
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF03.A0445.sag
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF04.A0445.sag
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF05.A0445.sag
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF06.A0445.sag
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF02.A0472.sag
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKTMP.A0472.sag
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF07.A0471.sag
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF21.A0471.sag
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF14.A0480.sag
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF15.A0481.sag
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF17.A0482.sag
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF16.A0483.sag
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF22.A0485.sag
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF20.A0490.sag
+>${printdir}/${PROD}.TA${CO}030M.DISS.PRT01.A0496
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF24.A0496.sag
+>${printdir}/${PROD}.TA${CO}030M.DISS.PRT01.A0497
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF03.DETL.TXT           # Roy-4972
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF04.SUM.TXT            # Roy-4972
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF05.ACT.TXT            # Roy-4972
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF06.HDETL.TXT          # Roy-4972
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF07.HSUM.TXT           # Roy-4972
+>${workdir}/${PROD}.TA${CO}030M.DISS.WKF08.HACT.TXT           # Roy-4972 
+ 
+# default parms..
+# CO=XX;NATPROC=NATPRODX;LIBRARY=TRXX;PROD=PROD;
+echo "all parms" $CO $NATPROC $LIBRARY $PROD;
+ 
+# ==================================================================
+# STEP: NEWTASK
+#  JOB DESCRIPTION - MONTHLY ARTIST STATEMENT PRINTING
+# ------------------------------------------------------------------
+#  09/02/03  M.WILLIAMS  CREATE PROC
+#  08/22/05  F.LAX       ADDED A DATSET TO SORT DATA IN PAYEE
+#                        AND THEN COURTESY COPY SEQUENCE
+#                        ISSUE # 37540
+#                        STEP A0472 WORK FILE 3
+#                        ISSUE # 42257 TO ADD WORK FILE TO THIS PROC
+#                        AS WELL AS TA460
+#  01/03/05  D.TOU       STEP GDGCOPY1 ADDED SPACE (HD2078574)
+#  01/25/05  A.TAN       ADD SPACE FOR SORTWK* IN A0490 (HD2083492)
+#  07/29/07  J.MORENOS   ADD SPACE FOR SORTWK* IN A0464, A0482, A0483
+#                        A0485, A0497 - (HD2609210)
+#  01/09/18 C. Lorenzo   Roy-4972- Create and send stmt extracts to RDW 
+#  10/22/19 E. VanHuizen Roy-5785- FTP change to GOAnywhere  
+# ==================================================================
+# ------------------------------------------------------------------
+#                  CREATE NEW SUBMITTED TASK RECORD
+# ------------------------------------------------------------------
+STEP=NEWTASK; export STEP
+ 
+NATPGM=TR0B5707; export NATPGM
+ROYINPT=TA${CO}030M; export ROYINPT
+./proclib/$NATPROC
+ 
+# check return code
+rc=$?
+rc_NEWTASK=rc
+echo `date` "JOB $jobname step NEWTASK completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step NEWTASK completed rc=$rc"
+ 
+unset  NATPGM ROYINPT STEP
+ 
+# *******************************************************************
+# STEP: A0464       ( in original JCL: COND=(0,NE) )
+#          SORT STMNT INFO PRIOR TO COMPRESS.                       *
+# *******************************************************************
+STEP=A0464; export STEP
+if [ "$rc" -eq "0" ]
+then
+ 
+ROYINPT=A0464R05; export ROYINPT
+CMWKF01=${tapedir}/${PROD}.TA${CO}010M.TAPE.WKF02.A1934_G0.sag; export CMWKF01
+CMWKF02=${workdir}/${PROD}.TA${CO}030M.DISS.WKF02.A0464.sag; export CMWKF02
+CMWKF12=${workdir}/${PROD}.TA${CO}030M.DISS.WKF12.A0464; export CMWKF12
+./proclib/$NATPROC
+ 
+# check return code
+rc=$?
+rc_A0464=rc
+echo `date` "JOB $jobname step A0464 completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step A0464 completed rc=$rc"
+ 
+unset  CMWKF01 CMWKF02 CMWKF12 ROYINPT STEP
+else
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" >> $MSGLOG
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc"
+fi
+ 
+# *******************************************************************
+# STEP: A0465       ( in original JCL: COND=(0,NE) )
+#          COMPRESS STMT INFO BY ACCT, SOURCE OF SALES(D,C,L,F),    *
+#             SALES TYPE, SALES DATE, ARTICLE TITLE...              *
+# *******************************************************************
+STEP=A0465; export STEP
+if [ "$rc" -eq "0" ]
+then
+ 
+ROYINPT=A0465R05; export ROYINPT
+CMWKF01=${workdir}/${PROD}.TA${CO}030M.DISS.WKF02.A0464.sag; export CMWKF01
+CMWKF02=${workdir}/${PROD}.TA${CO}030M.DISS.WKF02.A0465.sag; export CMWKF02
+CMWKF12=${workdir}/${PROD}.TA${CO}030M.DISS.WKF12.A0464; export CMWKF12
+./proclib/$NATPROC
+ 
+# check return code
+rc=$?
+rc_A0465=rc
+echo `date` "JOB $jobname step A0465 completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step A0465 completed rc=$rc"
+ 
+unset  CMWKF01 CMWKF02 CMWKF12 ROYINPT STEP
+else
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" >> $MSGLOG
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc"
+fi
+ 
+# *******************************************************************
+# STEP: A0445       ( in original JCL: COND=(0,NE) )
+#        EXTRACT ACCOUNT INFORMATION FROM ACCT-DATA,                *
+#            ACCT-TRANS AND ACCT-PAYEE                              *
+# *******************************************************************
+STEP=A0445; export STEP
+if [ "$rc" -eq "0" ]
+then
+ 
+ROYINPT=A0445R05; export ROYINPT
+CMPRT01=${printdir}/${PROD}.TA${CO}030M.DISS.PRT01.A0445; export CMPRT01
+CMWKF02=${workdir}/${PROD}.TA${CO}030M.DISS.WKF02.A0465.sag; export CMWKF02
+CMWKF03=${workdir}/${PROD}.TA${CO}030M.DISS.WKF03.A0445.sag; export CMWKF03
+CMWKF04=${workdir}/${PROD}.TA${CO}030M.DISS.WKF04.A0445.sag; export CMWKF04
+CMWKF05=${workdir}/${PROD}.TA${CO}030M.DISS.WKF05.A0445.sag; export CMWKF05
+CMWKF06=${workdir}/${PROD}.TA${CO}030M.DISS.WKF06.A0445.sag; export CMWKF06
+CMWKF12=${workdir}/${PROD}.TA${CO}030M.DISS.WKF12.A0464; export CMWKF12
+./proclib/$NATPROC
+ 
+# check return code
+rc=$?
+rc_A0445=rc
+echo `date` "JOB $jobname step A0445 completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step A0445 completed rc=$rc"
+ 
+unset  CMPRT01 CMWKF02 CMWKF03 CMWKF04 CMWKF05 CMWKF06 CMWKF12 ROYINPT STEP
+else
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" >> $MSGLOG
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc"
+fi
+ 
+# *******************************************************************
+# STEP: A0472       ( in original JCL: COND=(0,NE) )
+#          SORT PRIOR TO EARNINGS ALLOCATION                        *
+# *******************************************************************
+STEP=A0472; export STEP
+if [ "$rc" -eq "0" ]
+then
+ 
+ROYINPT=A0472R05; export ROYINPT
+CMWKF01=${workdir}/${PROD}.TA${CO}030M.DISS.WKF03.A0445.sag; export CMWKF01
+CMWKF02=${workdir}/${PROD}.TA${CO}030M.DISS.WKF02.A0472.sag; export CMWKF02
+CMWKF03=${workdir}/${PROD}.TA${CO}030M.DISS.WKTMP.A0472.sag; export CMWKF03
+./proclib/$NATPROC
+ 
+# check return code
+rc=$?
+rc_A0472=rc
+echo `date` "JOB $jobname step A0472 completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step A0472 completed rc=$rc"
+ 
+unset  CMWKF01 CMWKF02 CMWKF03 ROYINPT STEP
+else
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" >> $MSGLOG
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc"
+fi
+ 
+# *******************************************************************
+# STEP: A0471       ( in original JCL: COND=(0,NE) )
+#        ALLOCATE STATEMENT EARNINGS TO EACH                        *
+#            PAYEE OF THE ACCOUNT                                   *
+# *******************************************************************
+STEP=A0471; export STEP
+if [ "$rc" -eq "0" ]
+then
+ 
+ROYINPT=A0471R05; export ROYINPT
+CMWKF03=${workdir}/${PROD}.TA${CO}030M.DISS.WKF02.A0472.sag; export CMWKF03
+CMWKF07=${workdir}/${PROD}.TA${CO}030M.DISS.WKF07.A0471.sag; export CMWKF07
+CMWKF12=${workdir}/${PROD}.TA${CO}030M.DISS.WKF12.A0464; export CMWKF12
+CMWKF21=${workdir}/${PROD}.TA${CO}030M.DISS.WKF21.A0471.sag; export CMWKF21
+./proclib/$NATPROC
+ 
+# check return code
+rc=$?
+rc_A0471=rc
+echo `date` "JOB $jobname step A0471 completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step A0471 completed rc=$rc"
+ 
+unset  CMWKF03 CMWKF07 CMWKF12 CMWKF21 ROYINPT STEP
+else
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" >> $MSGLOG
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc"
+fi
+ 
+# *******************************************************************
+# STEP: A0480       ( in original JCL: COND=(0,NE) )
+#        SORT ACCOUNT WORK FILE BY OWNER NAME AND                   *
+#                     ACCOUNT NUMBER                                *
+# *******************************************************************
+STEP=A0480; export STEP
+if [ "$rc" -eq "0" ]
+then
+ 
+ROYINPT=A0480R05; export ROYINPT
+CMWKF05=${workdir}/${PROD}.TA${CO}030M.DISS.WKF05.A0445.sag; export CMWKF05
+CMWKF12=${workdir}/${PROD}.TA${CO}030M.DISS.WKF12.A0464; export CMWKF12
+CMWKF14=${workdir}/${PROD}.TA${CO}030M.DISS.WKF14.A0480.sag; export CMWKF14
+./proclib/$NATPROC
+ 
+# check return code
+rc=$?
+rc_A0480=rc
+echo `date` "JOB $jobname step A0480 completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step A0480 completed rc=$rc"
+ 
+unset  CMWKF05 CMWKF12 CMWKF14 ROYINPT STEP
+else
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" >> $MSGLOG
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc"
+fi
+ 
+# *******************************************************************
+# STEP: A0481       ( in original JCL: COND=(0,NE) )
+# SORT TRANSACTION WORK FILE BY OWNER NAME, ACCOUNT NO,             *
+#      PAYEE % OF PARTICIPATION(DESC), PAYEE CODE                   *
+# *******************************************************************
+STEP=A0481; export STEP
+if [ "$rc" -eq "0" ]
+then
+ 
+ROYINPT=A0481R05; export ROYINPT
+CMWKF06=${workdir}/${PROD}.TA${CO}030M.DISS.WKF06.A0445.sag; export CMWKF06
+CMWKF12=${workdir}/${PROD}.TA${CO}030M.DISS.WKF12.A0464; export CMWKF12
+CMWKF15=${workdir}/${PROD}.TA${CO}030M.DISS.WKF15.A0481.sag; export CMWKF15
+./proclib/$NATPROC
+ 
+# check return code
+rc=$?
+rc_A0481=rc
+echo `date` "JOB $jobname step A0481 completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step A0481 completed rc=$rc"
+ 
+unset  CMWKF06 CMWKF12 CMWKF15 ROYINPT STEP
+else
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" >> $MSGLOG
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc"
+fi
+ 
+# *******************************************************************
+# STEP: A0482       ( in original JCL: COND=(0,NE) )
+# SORT STATEMENT WORK FILE BY OWNER NAME, ACCOUNT NO,               *
+#      PAYEE % OF PARTICIPATION(DESC), PAYEE CODE.                  *
+#      PAYEE STMT NO, TYPE OF EARNING (D,C,L,F),                    *
+#      RECORD TYPE (SUMMARY, DETAIL, TOTAL), ARTICLE                *
+#      TITLE, SALES TERR, ARTICLE NO, SUBCON, SALES                 *
+#      CHANNEL DESC, PRICE LEVEL SEQ (H,M,B), PRICE                 *
+#      CODE, SALES DATE                                             *
+# *******************************************************************
+STEP=A0482; export STEP
+if [ "$rc" -eq "0" ]
+then
+ 
+ROYINPT=A0482R05; export ROYINPT
+CMWKF07=${workdir}/${PROD}.TA${CO}030M.DISS.WKF07.A0471.sag; export CMWKF07
+CMWKF12=${workdir}/${PROD}.TA${CO}030M.DISS.WKF12.A0464; export CMWKF12
+CMWKF17=${workdir}/${PROD}.TA${CO}030M.DISS.WKF17.A0482.sag; export CMWKF17
+./proclib/$NATPROC
+ 
+# check return code
+rc=$?
+rc_A0482=rc
+echo `date` "JOB $jobname step A0482 completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step A0482 completed rc=$rc"
+ 
+unset  CMWKF07 CMWKF12 CMWKF17 ROYINPT STEP
+else
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" >> $MSGLOG
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc"
+fi
+ 
+# *******************************************************************
+# STEP: A0483       ( in original JCL: COND=(0,NE) )
+#        SORT PAYEE WORK FILE BY OWNER NAME AND ACCOUNT NO          *
+# *******************************************************************
+STEP=A0483; export STEP
+if [ "$rc" -eq "0" ]
+then
+ 
+ROYINPT=A0483R05; export ROYINPT
+CMWKF04=${workdir}/${PROD}.TA${CO}030M.DISS.WKF04.A0445.sag; export CMWKF04
+CMWKF12=${workdir}/${PROD}.TA${CO}030M.DISS.WKF12.A0464; export CMWKF12
+CMWKF16=${workdir}/${PROD}.TA${CO}030M.DISS.WKF16.A0483.sag; export CMWKF16
+./proclib/$NATPROC
+ 
+# check return code
+rc=$?
+rc_A0483=rc
+echo `date` "JOB $jobname step A0483 completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step A0483 completed rc=$rc"
+ 
+unset  CMWKF04 CMWKF12 CMWKF16 ROYINPT STEP
+else
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" >> $MSGLOG
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc"
+fi
+ 
+# *******************************************************************
+# STEP: A0485       ( in original JCL: COND=(0,NE) )
+#        SORT EARNINGS SUMMARY WORK FILE BY OWNER NAME, ACCOUNT NO, *
+#        PAYEE % OF PARTICIPATION(DESC), PAYEE CODE,                *
+#        SOURCE TYPE.                                               *
+# *******************************************************************
+STEP=A0485; export STEP
+if [ "$rc" -eq "0" ]
+then
+ 
+ROYINPT=A0485R05; export ROYINPT
+CMWKF12=${workdir}/${PROD}.TA${CO}030M.DISS.WKF12.A0464; export CMWKF12
+CMWKF21=${workdir}/${PROD}.TA${CO}030M.DISS.WKF21.A0471.sag; export CMWKF21
+CMWKF22=${workdir}/${PROD}.TA${CO}030M.DISS.WKF22.A0485.sag; export CMWKF22
+./proclib/$NATPROC
+ 
+# check return code
+rc=$?
+rc_A0485=rc
+echo `date` "JOB $jobname step A0485 completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step A0485 completed rc=$rc"
+ 
+unset  CMWKF12 CMWKF21 CMWKF22 ROYINPT STEP
+else
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" >> $MSGLOG
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc"
+fi
+ 
+# *******************************************************************
+# STEP: A0490       ( in original JCL: COND=(0,NE) )
+#        MERGE AND SORT 6 WORK FILES TO PRODUCE 1 WORK FILE FOR     *
+#        INPUT INTO THE PRINT STATEMENT PRINT STEP                  *
+# *******************************************************************
+STEP=A0490; export STEP
+if [ "$rc" -eq "0" ]
+then
+ 
+cat ${workdir}/${PROD}.TA${CO}030M.DISS.WKF14.A0480.sag ${workdir}/${PROD}.TA${CO}030M.DISS.WKF15.A0481.sag ${workdir}/${PROD}.TA${CO}030M.DISS.WKF17.A0482.sag ${workdir}/${PROD}.TA${CO}030M.DISS.WKF16.A0483.sag ${workdir}/${PROD}.TA${CO}030M.DISS.WKF22.A0485.sag > ${tempdir}/${jobname}.${pid}.temp.A0490.64.sag
+ 
+ROYINPT=A0490R05; export ROYINPT
+CMWKF19=${tempdir}/${jobname}.${pid}.temp.A0490.64.sag; export CMWKF19
+CMWKF20=${workdir}/${PROD}.TA${CO}030M.DISS.WKF20.A0490.sag; export CMWKF20
+./proclib/$NATPROC
+ 
+# check return code
+rc=$?
+rc_A0490=rc
+echo `date` "JOB $jobname step A0490 completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step A0490 completed rc=$rc"
+ 
+unset  CMWKF19 CMWKF20 ROYINPT STEP
+else
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" >> $MSGLOG
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc"
+fi
+ 
+# *******************************************************************
+# STEP: A0496       ( in original JCL: COND=(0,NE) )
+#      STATEMENT PRINT STEP.                                        *
+#      AN ADDITIONAL WORK FILE IS USED ONLY WITHIN THIS STEP TO     *
+#      PROCESS MULTIPLE COPIES OF THE SAME STATEMENT.               *
+# *******************************************************************
+STEP=A0496; export STEP
+if [ "$rc" -eq "0" ]
+then
+ 
+ROYINPT=A0496R05; export ROYINPT
+CMPRT01=${printdir}/${PROD}.TA${CO}030M.DISS.PRT01.A0496; export CMPRT01
+CMWKF12=${workdir}/${PROD}.TA${CO}030M.DISS.WKF12.A0464; export CMWKF12
+CMWKF20=${workdir}/${PROD}.TA${CO}030M.DISS.WKF20.A0490.sag; export CMWKF20
+CMWKF24=${workdir}/${PROD}.TA${CO}030M.DISS.WKF24.A0496.sag; export CMWKF24
+CMWKF03=${workdir}/${PROD}.TA${CO}030M.DISS.WKF03.DETL.TXT; export CMWKF03      # Roy-4972
+CMWKF04=${workdir}/${PROD}.TA${CO}030M.DISS.WKF04.SUM.TXT; export CMWKF04       # Roy-4972
+CMWKF05=${workdir}/${PROD}.TA${CO}030M.DISS.WKF05.ACT.TXT; export CMWKF05       # Roy-4972
+CMWKF06=${workdir}/${PROD}.TA${CO}030M.DISS.WKF06.HDETL.TXT; export CMWKF06     # Roy-4972
+CMWKF07=${workdir}/${PROD}.TA${CO}030M.DISS.WKF07.HSUM.TXT; export CMWKF07      # Roy-4972
+CMWKF08=${workdir}/${PROD}.TA${CO}030M.DISS.WKF08.HACT.TXT; export CMWKF08      # Roy-4972
+./proclib/$NATPROC
+ 
+# check return code
+rc=$?
+rc_A0496=rc
+echo `date` "JOB $jobname step A0496 completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step A0496 completed rc=$rc"
+ 
+unset  CMPRT01 CMWKF12 CMWKF20 CMWKF24 ROYINPT STEP
+else
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" >> $MSGLOG
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc"
+fi
+ 
+# *******************************************************************
+# STEP: A0497       ( in original JCL: COND=(0,NE) )
+#        CALCULATE CONTROL TOTALS USING INPUT TAPE FROM PREVIOUS    *
+#        STEP  (TAAM4613). (MOTOWN USES TR0B0498)                   *
+#        CREATE CONTROL TOTALS.                                     *
+# *******************************************************************
+STEP=A0497; export STEP
+if [ "$rc" -eq "0" ]
+then
+ 
+ROYINPT=A0497R05; export ROYINPT
+CMPRT01=${printdir}/${PROD}.TA${CO}030M.DISS.PRT01.A0497; export CMPRT01
+CMWKF12=${workdir}/${PROD}.TA${CO}030M.DISS.WKF12.A0464; export CMWKF12
+CMWKF20=${workdir}/${PROD}.TA${CO}030M.DISS.WKF20.A0490.sag; export CMWKF20
+./proclib/$NATPROC
+ 
+# check return code
+rc=$?
+rc_A0497=rc
+echo `date` "JOB $jobname step A0497 completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step A0497 completed rc=$rc"
+ 
+unset  CMPRT01 CMWKF12 CMWKF20 ROYINPT STEP
+else
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" >> $MSGLOG
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc"
+fi
+
+# ==================================================================
+# STEP: TOUCH trigger file       ( in original JCL: COND=(0,NE) )   Roy-4972
+# ==================================================================
+
+touch ${workdir}/trigger_arw.txt	# Ensuring the ARW trigger file is always available
+
+# *******************************************************************
+#
+#                                                                   *
+#       FTP ME statement extract files to RDW server- Roy-4972      *
+#                                                                   *
+# *******************************************************************
+STEP=FTP030M; export STEP
+
+if [ "$rc" -eq "0" ] 
+then
+
+# FTPPROC=TRFTPDYN; export FTPPROC # ROY-5785 
+FTPPROC=FTPDYN2GO; export FTPPROC  # ROY-5785
+# FTPSVR=RDWSVR; export FTPSVR                                   # ROY-5785 
+SRVR2=RDWSVR; export SRVR2 
+ 
+# set up default values: 
+# DIRCMD=RDWUSAC; export DIRCMD                                  # ROY-5785 
+# DIRCMD=RDWGOUAT; export DIRCMD                                 # ROY-5785 test only 
+DIRCMD=RDWGODIR; export DIRCMD                                   # ROY-5785 
+
+ROYINPT=A9904R02; export ROYINPT
+FTPCMD=TA${CO}0301; export FTPCMD
+# DIRC2=NOINPUT; export DIRC2                                    # ROY-5785 
+# DIRC2=RDWGOUAT; export DIRC2                                   # ROY-5785 test only
+DIRC2=RDWGODIR; export DIRC2                                     # ROY-5785
+
+./proclib/$FTPPROC
+
+# check return code
+rc=$?
+rc_FTP030M=$rc
+echo `date` "JOB $jobname step FTP030M completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step FTP030M completed rc=$rc"  
+ 
+unset  DIRC2 FTPCMD ROYINPT STEP 
+
+else
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" >> $MSGLOG
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" 
+fi 
+ 
+# ---------------------------------------------------------------
+# STEP: GDGCOPY1       ( in original JCL: COND=(0,NE) )
+#                  BACKUP MONTHLY REPORT FILE
+# ---------------------------------------------------------------
+if [ "$rc" -eq "0" ]
+then
+ 
+cp ${printdir}/${PROD}.TA${CO}030M.DISS.PRT01.A0496 ${workdir}/${PROD}.TA${CO}030M.DISS.SYSUT2.GDGCOPY1_G
+ 
+# check return code
+rc=$?
+rc_GDGCOPY1=rc
+echo `date` "JOB $jobname step GDGCOPY1 completed rc=$rc" >> $MSGLOG
+echo `date` "JOB $jobname step GDGCOPY1 completed rc=$rc"
+ 
+else
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc" >> $MSGLOG
+  echo `date` "JOB $jobname step $STEP not run because COND code rc=$rc"
+fi
+ 
+# ---------------------------------------------------
+# roll GDG files ...
+# ---------------------------------------------------
+echo "calling gdgroll:" ${workdir}/${PROD}.TA${CO}030M.DISS.SYSUT2.GDGCOPY1_G
+./proclib/gdgroll.pl -f ${workdir}/${PROD}.TA${CO}030M.DISS.SYSUT2.GDGCOPY1_G
+gdg_rc=$?;export gdg_rc
+./proclib/gdg_rc.sh
+ 
+echo $jobname $pid `date` "procedure TA030 completed" >> $MSGLOG
+exit $rc
+ 
+# ---------------------------------------------------
+# end of procedure
+# ---------------------------------------------------
